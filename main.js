@@ -37,7 +37,7 @@ class OptimizationProblem {
     return this.isMaximization ? 'maximization' : 'minimization';
   }
 
-  // Build Standardized Model
+  // Build Standardized odel
   buildStandardModel() {
     const zMaxValue = Math.max(...Object.values(this.z));
     const artificialsForZ = {};
@@ -203,14 +203,15 @@ class OptimizationProblem {
 
 }
 
-const problem = new OptimizationProblem(isMaximization, zObj, restrictionsObj);
+const problem = new OptimizationProblem(false, zObj, restrictionsObj);
+console.log(problem);
 problem.buildStandardModel();
 
 console.log(problem.equations);
-// console.log(problem.slackVariables);
-// console.log(problem.artificialVariables);
-// console.log(problem.zStandard);
-// console.log(problem.standardArrays);
-// console.log(problem.parseEquation(problem.zStandard));
+console.log(problem.slackVariables);
+console.log(problem.artificialVariables);
+console.log(problem.zStandard);
+console.log(problem.standardArrays);
+console.log(problem.parseEquation(problem.zStandard));
 problem.solveProblem();
 
