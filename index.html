@@ -1,33 +1,148 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Mi Página Single Page</title>
-  <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-  <div class="header">
-    <img class="logo" src="img/logo.png" alt="Logotipo">
-    <div class="buttons">
-      <button>Inicio</button>
-      <button>Resolver</button>
-      <img class="icon" src="img/icon/github.png" alt="Icono 2">
-      <img class="icon" src="img/icon/sol.png" alt="Icono 1">
-    </div>     
-  </div>
-  
-  <div class="content">
-    <img class="logo" src="img/logo2.png" alt="Logotipo">
-    <div class="subtitle">
-      Vesto es rápido, optimizado e intuitivo
-    </div>
-    <div class="additional-text">
-      Potenciado para la resolución de problemas de optimización mediante el método simplex.
-    </div>
-    <div class="start-button">
-      <button>Empezar</button>
-    </div>
-  </div>
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Vesto - Simplex Calculator</title>
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <link rel="icon" href="public/vesto-favicon.png">
+    <script defer src="src/js/OptimizationProblem.js"></script>
+    <script defer src="src/js/getInverseMatrix.js"></script>
+    <script defer src="src/main.js"></script>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo-text">
+        <img class="logo-nav" src="public/vesto-favicon.png" alt="Vesto logo">
+        <span class="text-vesto">Vesto</span>
+      </div>
+      <div class="options">
+        <button 
+          class="btn home-btn active"
+          data-section="home"
+        >
+          Inicio
+        </button>
+        <button 
+          class="btn solve-btn"
+          data-section="solve"
+        >
+          Resolver
+        </button>
+        <img class="option toggle-theme" src="src/assets/icons/sun.png" alt="Toggle theme">
+        <img class="option github" src="src/assets/icons/github.png" alt="Github repository">
+      </div>     
+    </nav>
+
+    <!-- Home -->
+    <section class="section home-section hidden">
+      <div class="home-content">
+        <img class="logo" src="public/blue-vesto-logo.png" alt="Vesto blue logo">
+        <div class="subtitle">
+          Vesto es rápido, optimizado e intuitivo
+        </div>
+        <div class="additional-text">
+          Potenciado para la resolución de problemas de optimización mediante el método simplex.
+        </div>
+        <button class="main-btn start-btn">Empezar</button>
+        <div class="details">
+          <p>v0.0.1-beta</p>
+          <p class="made-with-love">Made with <img class="heart" src="src/assets/icons/heart.png" alt="heart"></p>
+        </div>
+      </div>
+      <div class="bg-home"></div>
+      <div class="blur"></div>
+    </section>
+
+    <!-- Solve -->
+    <section class="section solve-section ">
+      <h3 class="section-subtitle">VALORES INICIALES</h3>
+
+      <!-- Form -->
+      <form class="form-init-values">
+        <div class="init-values-container">
+          <div class="left-values-container">
+
+            <div class="input-cont input-problem-type">
+              <label for="problem-type">Tipo de problema</label>
+              <select class="input-value">
+                <option selected value="maximization">Maximización</option>
+                <option value="minimization">Minimización</option>
+              </select>
+            </div>
+
+            <div class="input-cont input-problem-variables">
+              <label for="number-variables">Cant. Variables</label>
+              <input class="input-value number-variables" type="text" name="number-variables" value="2">
+            </div>
+
+            <div class="inputs-bottom function">
+              <label class="z-function" for="z-function">Función Z</label>
+
+              <!-- Variables values -->
+              <div class="variables-values">
+                <div class="var">
+                  <input class="input-value value-x1" type="text" name="number-variables" value="">
+                  <p class="variable">X<span class="subscript">1</span></p>
+                </div>
+                +
+                <div class="var">
+                  <input class="input-value value-x2" type="text" name="number-variables" value="">
+                  <p class="variable">X<span class="subscript">2</span></p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="right-values-container">
+            <!-- Restrictions -->
+            <div class="inputs-bottom restrictions">
+              <label for="restrictions">Restricciones</label>
+
+              <!-- Variables values -->
+              <div class="variables-values restriction">
+                <div class="var">
+                  <input class="input-value value-x1" type="text" name="number-variables" value="">
+                  <p class="variable">X<span class="subscript">1</span></p>
+                </div>
+                +
+                <div class="var">
+                  <input class="input-value value-x2" type="text" name="number-variables" value="">
+                  <p class="variable">X<span class="subscript">2</span></p>
+                </div>
+
+                <select class="input-value comparison">
+                  <option selected value=">=">≥</option>
+                  <option value="<=">≤</option>
+                  <option value="<=">=</option>
+                </select>
+
+                <input class="input-value result" type="text" name="result" value="">
+              </div>
+
+              <!-- Button add restriction -->
+              <button type="button" class="add-rest-btn">Agregar</button>
+            </div>
+          </div>
+        </div>
+        <div class="solve-btn-container">
+          <button class="main-btn" type="submit">Resolver</button>
+        </div>
+        
+      </form>
+      
+    </section>
+
+    <!-- Standard Model -->
+    <section class="section standard-model-section hidden">
+      
+    </section>
+
+    <!-- Iteration -->
+    <section class="section iteration-section hidden">
+      
+    </section>
+  </body>
 </html>
 
