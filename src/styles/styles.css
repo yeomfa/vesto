@@ -66,7 +66,7 @@
   align-items: center;
 }
 
-.navbar .options .btn {
+.navbar .options .btn-option {
   cursor: pointer;
   font-size: 17px;
   background-color: transparent;
@@ -217,18 +217,13 @@ label {
   display: flex;
 }
 
-.left-values-container {
+.values-container {
   width: 50%;
   height: inherit;
   display: flex;
   flex-direction: column;
   gap: 40px;
-  align-items: space-between;
-}
-
-.right-values-container {
-  width: 50%;
-  height: inherit;
+  align-items: flex-start;
 }
 
 .solve-btn-container {
@@ -274,20 +269,23 @@ label {
   font-size: 12px;
 }
 
-.input-value {
+.input-field {
   text-align: center;
-  background: #303030;
-  border: 2px solid #4C4C4C;
+  background: var(--light-bg-color);
+  border: 2px solid var(--input-border-color);
   border-radius: 4px;
+  padding: 0 4px;
+  min-width: 30px;
 }
 
-.variables-values .input-value {
-  width: 30px;
+.input-field:focus {
+  border: 2px solid var(--white-color);
+  outline: none;
 }
 
 /* Restrictions */
 .variables-values .result {
-  width: 50px;
+  min-width: 50px;
 }
 
 .add-rest-btn {
@@ -301,4 +299,10 @@ label {
   height: 30px;
   padding: 0 20px;
   width: 100px;
+}
+
+.restrictions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
