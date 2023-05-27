@@ -1,14 +1,14 @@
-function calculateInverse(matrix) {
+function getInverseMatrix(matrix) {
   const n = matrix.length;
   const identity = generateIdentityMatrix(n);
 
-  // Construir una matriz extendida [matriz | identidad]
+  // Construct an extended array [array | identity]
   const augmentedMatrix = [];
   for (let i = 0; i < n; i++) {
     augmentedMatrix.push([...matrix[i], ...identity[i]]);
   }
 
-  // Gauss-Jordan eliminación
+  // Gauss-Jordan elimination
   for (let i = 0; i < n; i++) {
     // Swap rows if the pivot is zero
     if (augmentedMatrix[i][i] === 0) {
@@ -20,13 +20,13 @@ function calculateInverse(matrix) {
       }
     }
 
-    // Hacer el pivote igual a 1
+    // Make the pivot equal to 1
     const pivot = augmentedMatrix[i][i];
     for (let j = i; j < 2 * n; j++) {
       augmentedMatrix[i][j] /= pivot;
     }
 
-    // Hacer ceros en las otras filas
+    // Make zeros in the other rows
     for (let j = 0; j < n; j++) {
       if (j !== i) {
         const coefficient = augmentedMatrix[j][i];
@@ -37,7 +37,7 @@ function calculateInverse(matrix) {
     }
   }
 
-  // Extraer la matriz invers
+  // Extract the inverse matrix
    const inverseMatrix = augmentedMatrix.map((row) => row.slice(n));
 
   return inverseMatrix;
@@ -52,14 +52,3 @@ function generateIdentityMatrix(n) {
   }
   return identityMatrix;
 }
-
-const matrix = [
-  [1, 2, 3],
-  [4, 5, 6],
-  [7, 2, 9]
-];
-
-const inverse = calculateInverse(matrix);
-
-console.log(inverse);
-

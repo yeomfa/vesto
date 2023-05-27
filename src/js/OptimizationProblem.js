@@ -1,22 +1,21 @@
-'use strict';
 
 // Restrictions
-const decitionVariables = 2; // x1, x2, ...
-const isMaximization = true;
+// const decitionVariables = 2; // x1, x2, ...
+// const isMaximization = true;
 
 // z = '120x1 + 200x2';
-const zObj = {x1: 120, x2: 200};
+// const zObj = {x1: 120, x2: 200};
 
 // x1 + x2 >= 65
 // x1 + 0 >= 23
 // 0 + x2 >= 23
 // 60x1 + 24x2 >= 23
-const restrictionsObj = [
-  {x1: 1, x2: 1, comparison: '=', result: 65},
-  {x1: 1, x2: 0, comparison: '>=', result: 23},
-  {x1: 0, x2: 1, comparison: '>=', result: 20},
-  {x1: 60, x2: 24, comparison: '<=', result: 3000},
-];
+// const restrictionsObj = [
+//   {x1: 1, x2: 1, comparison: '=', result: 65},
+//   {x1: 1, x2: 0, comparison: '>=', result: 23},
+//   {x1: 0, x2: 1, comparison: '>=', result: 20},
+//   {x1: 60, x2: 24, comparison: '<=', result: 3000},
+// ];
 
 class OptimizationProblem {
   slackVariables = {};
@@ -30,6 +29,8 @@ class OptimizationProblem {
     this.isMaximization = isMaximization;
     this.z = z;
     this.restrictions = restrictions;
+
+    this.#buildStandardModel();
   }
 
   // Problem type
@@ -37,8 +38,8 @@ class OptimizationProblem {
     return this.isMaximization ? 'maximization' : 'minimization';
   }
 
-  // Build Standardized Model
-  buildStandardModel() {
+  // Build Standardized odel
+  #buildStandardModel() {
     const zMaxValue = Math.max(...Object.values(this.z));
     const artificialsForZ = {};
     const slacksForZ = {};
@@ -104,10 +105,11 @@ class OptimizationProblem {
   #buildStandardArrays() {
     this.standardArrays.x = Object.keys(this.zStandard);
 
+    const toMultiply = this.isMaximization ? 1 : -1;
     this.standardArrays.c = Object.entries(this.zStandard).map(([key, value]) => {
       if (key.startsWith('s')) return {[`${key}`]: value};
       
-      return {[`${key}`]: value};
+      return {[`${key}`]: value * toMultiply};
     });
 
     this.standardArrays.b = this.restrictions.map(restriction => restriction.result);
@@ -202,15 +204,3 @@ class OptimizationProblem {
   }
 
 }
-
-const problem = new OptimizationProblem(isMaximization, zObj, restrictionsObj);
-problem.buildStandardModel();
-
-console.log(problem.equations);
-// console.log(problem.slackVariables);
-// console.log(problem.artificialVariables);
-// console.log(problem.zStandard);
-// console.log(problem.standardArrays);
-// console.log(problem.parseEquation(problem.zStandard));
-problem.solveProblem();
-
