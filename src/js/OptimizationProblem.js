@@ -191,12 +191,17 @@ class OptimizationProblem {
         console.log('z', z);
         console.log('B inverse per b', BInversePerBRound);
         console.log('ultima iteracion');
-        const xOptimized = {};
+        const xOptimized = [[], []];
         this.standardArrays.x.forEach(key => {
           const value = BInversePerBRound[xBase.indexOf(key)];
-          if (value) xOptimized[key] = value[0]; 
-          else xOptimized[key] = 0;
+          xOptimized[0].push(key);
+          if (value) {
+            xOptimized[1].push(value);
+          } else {
+            xOptimized[1].push(0);
+          };
         });
+        console.log(xOptimized);
         console.log(xOptimized);
         this.status = true;
 

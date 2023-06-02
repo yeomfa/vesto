@@ -9,6 +9,8 @@ const createBtn = document.querySelector('.create-btn');
 const optionBtns = document.querySelectorAll('.btn-option');
 const addRestBtn = document.querySelector('.add-rest-btn');
 const execSolveBtn = document.querySelector('.solve-exec-btn'); 
+const solutionBtn = document.querySelector('.btn-solution'); 
+const navBar = document.querySelector('.navbar');
 
 // Sections
 const sections = document.querySelectorAll('.section');
@@ -29,6 +31,9 @@ const problemsLink = document.querySelector('.link-problems');
 
 // Msg
 const addProblemMsg = document.querySelector('.add-problem-msg');
+const notify = document.querySelector('.notify'); 
+const notifyHeader = document.querySelector('.notify-header');
+const notifyBody = document.querySelector('.notify-body');
 
 class App {
   decitionVariables = 2;
@@ -48,10 +53,9 @@ class App {
     addRestBtn.addEventListener('click', this.#createRestriction.bind(this));
     execSolveBtn.addEventListener('click', this.#newOP.bind(this));
 
-    problemsLink.addEventListener('click', this.#showSection.bind(problemsBtn));
-
     problemsCont.addEventListener('click', this.#deleteProblem.bind(this));
     problemsCont.addEventListener('click', this.#selectProblem.bind(this));
+    solutionBtn.addEventListener('click', this.#showSolution.bind(this, solutionBtn));
 
     // Number variables observer 
     const variablesObserver = new MutationObserver(this.#loadVariables.bind(this));
@@ -60,6 +64,7 @@ class App {
       subtree: true,
     });
 
+    this.#showNotify('success', 'Completado', 'Tiene solución real', 5000);
     this.#loadProblems();
   }
 
@@ -115,14 +120,20 @@ class App {
       const problemId = problem.dataset.problemId;
       this.selectedProblem = this.OPs.find(op => op.id === problemId );
 
-      this.#showSection.call(el);
-      this.#showIterations();
+      this.#showSolution(el);
     }
+  }
+
+  #showSolution(element) {
+    this.#showSection.call(element);
+    this.#showIterations();
   }
 
   #showIterations() {
     iterationsCont.innerHTML = ''; 
+    const isSolved = this.selectedProblem.status;
     this.selectedProblem.iterations.forEach((iter, i) => {
+      const iterationsLength = this.selectedProblem.iterations.length;
       const {
         xBase,
         cBase,
@@ -130,10 +141,17 @@ class App {
         r,
         entersVariable,
         comesOutVariable,
+        xOptimized,
+        z,
       } = iter;
+
+      let iterHeader = i !== (iterationsLength - 1) 
+        ? i + 1
+        : `${i + 1} - RESULTADO <span class="${isSolved ? 'success-dot' : 'alert-dot'}">•</span>`;
+
       const html = `
         <div class="iterations-container">
-          <h3 class="section-subtitle">ITERACIÓN #${i + 1}</h3>
+          <h3 class="section-subtitle">ITERACIÓN #${iterHeader}</h3>
           <div class="iteration-content">
             <div class="top-iteration">
               <h3>Matrices Base</h3>
@@ -150,10 +168,10 @@ class App {
           </div>
         </div>
       `;
+
       iterationsCont.insertAdjacentHTML('beforeend', html);
       const arrayBaseCont = document.querySelector(`.array-base-container-${i}`);
       const solutionCont = document.querySelector(`.solution-container-${i}`);
-      console.log(solutionCont);
 
       // Base array's
       this.#createArrayTemplate(xBase, 'x base', arrayBaseCont);
@@ -162,10 +180,19 @@ class App {
 
       // Solution
       this.#createArrayTemplate(r, 'r', solutionCont);
-      this.#createArrayTemplate([entersVariable], 'Entra >', solutionCont);
-      this.#createArrayTemplate([comesOutVariable], 'Sale <', solutionCont);
-
+      if (i === iterationsLength - 1) {
+        this.#createArrayTemplate(xOptimized, 'x optimizada', solutionCont);
+        this.#createArrayTemplate([z], 'Z', solutionCont);
+      } else {
+        this.#createArrayTemplate([entersVariable], 'Entra >', solutionCont);
+        this.#createArrayTemplate([comesOutVariable], 'Sale <', solutionCont);
+      }
     });
+
+    if (this.selectedProblem.status)
+      this.#showNotify('success', 'Completado', 'Tiene solución real', 5000);
+    if (!this.selectedProblem.status)
+      this.#showNotify('alert', 'Rechazado', 'No tiene solución real', 5000);
   }
 
   #deleteProblem(e) {
@@ -182,7 +209,6 @@ class App {
   }
 
   #showSection() {
-    console.log(this);
     const btn = this;
     const sectionName = btn.dataset.section;
     const section = [...sections].find(sec => sec.classList.contains(`${sectionName}-section`));
@@ -380,6 +406,33 @@ class App {
 
     container.insertAdjacentHTML('beforeend', html);
   }
+
+  #showNotify(type, header, body, time) {
+    notifyHeader.textContent = header;
+    notifyBody.textContent = body;
+
+    if (type === 'success') {
+      notify.classList.add(type);
+      notify.classList.remove('alert');
+    }
+
+    if (type === 'alert') {
+      notify.classList.add(type);
+      notify.classList.remove('success');
+    }
+
+    notify.classList.remove('hidden');
+    notify.style.opacity = 1;
+
+    if (time)
+      setTimeout(() => {
+        notify.style.opacity = 0;
+        setTimeout(() => {
+          notify.classList.add('hidden');
+        }, 500)
+      }, time);
+  }
+
 }
 
 const app = new App();
