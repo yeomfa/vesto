@@ -142,6 +142,7 @@ class App {
         comesOutVariable,
         xOptimized,
         z,
+        teta
       } = iter;
 
       let iterHeader = i !== (iterationsLength - 1) 
@@ -183,8 +184,9 @@ class App {
         this.#createArrayTemplate(xOptimized, 'x optimizada', solutionCont);
         this.#createArrayTemplate([z], 'Z', solutionCont);
       } else {
-        this.#createArrayTemplate([entersVariable], 'Entra >', solutionCont);
-        this.#createArrayTemplate([comesOutVariable], 'Sale <', solutionCont);
+        this.#createArrayTemplate(teta, 'θ', solutionCont);
+        this.#createArrayTemplate([entersVariable], 'Entra', solutionCont);
+        this.#createArrayTemplate([comesOutVariable], 'Sale', solutionCont);
       }
     });
 
@@ -377,6 +379,7 @@ class App {
   }
 
   #createArrayTemplate(array, index = '', container) {
+    console.log(array);
     let arrTemplate = '';
     const isMatrix = typeof array[0] === 'object';
 

@@ -175,23 +175,16 @@ class OptimizationProblem {
       const minValueR = Math.min(...rFlat);
       const entersIndex = rFlat.findIndex(value => value === minValueR);
       const entersVariable = this.standardArrays.x[entersIndex];
-      console.log('r:', r);
-      console.log('Min index in r [Enters]:', entersIndex);
-      console.log('Var [Enters]:', entersVariable);
 
       // console.log('bValues: ', bValues);
       // console.log('cValues: ', cValues);
 
       // 3) Calc Breverse*b
       const BInversePerB = MatrixCalc.multiplyMatrix(BInverse, bValues);
-      console.log('B inverse per b', BInversePerB);
 
       if (minValueR >= 0) {
         const z = MatrixCalc.multiplyMatrix(cBaseTransposed, BInversePerB); 
         const BInversePerBRound = MatrixCalc.roundMatrix(BInversePerB);
-        console.log('z', z);
-        console.log('B inverse per b', BInversePerBRound);
-        console.log('ultima iteracion');
         const xOptimized = [[], []];
         this.standardArrays.x.forEach(key => {
           const value = BInversePerBRound[xBase.indexOf(key)];
@@ -202,8 +195,6 @@ class OptimizationProblem {
             xOptimized[1].push(0);
           };
         });
-        console.log(xOptimized);
-        console.log(xOptimized);
         this.status = true;
 
         const xBaseToSave = [...xBase];
@@ -228,37 +219,23 @@ class OptimizationProblem {
 
       // 4) Calc Breverse*A, select the same row as the minimum value in r, [enters]
       const BInversePerA = MatrixCalc.multiplyMatrix(BInverse, this.standardArrays.A);
-      console.log('B inverse * A:', BInversePerA);
 
       // Select row in BInversePerA
       const selectedRow = BInversePerA.map(row => row[entersIndex]);
-      console.log('Selected row', selectedRow);
 
 
       // 5) Calc Breverse*b / selected row of Breverse*A, select minumum value (except infinity and negative values) [comes out]
       const BInversePerBFlat = BInversePerB.flat();
       // console.log(BInversePerBFlat);
       const teta = BInversePerBFlat.map((value, i) => value / selectedRow[i]);
-      console.log('Teta: ', teta);
       const comesOutArray = [...teta].sort((a, b) => a - b);
       const comesOutValue = comesOutArray.find(value => value >= 0);
       const comesOutIndex = teta.indexOf(comesOutValue);
       const comesOutVariable = xBase[comesOutIndex];
 
-      console.log('Min index comes out:', comesOutIndex); 
-      console.log('Var [Comes out]:', comesOutVariable); 
-
       // z = cbt * bInverse * b
       const z = MatrixCalc.multiplyMatrix(cBaseTransposed, BInversePerB); 
-      console.log('z', z);
 
-      console.log('/////////////////////////////////////');
-      console.log(xBase);
-      console.log(cBase);
-      console.log(B);
-      console.log(r);
-      console.log(entersVariable);
-      console.log(comesOutVariable);
 
       // Save iteration data
       const xBaseToSave = [...xBase];
@@ -266,6 +243,7 @@ class OptimizationProblem {
       const BToSave = B.map(row => [...row]);
       const rToSave = [...r]; 
 
+      console.log(teta);
       const iterationData = {
         xBase: xBaseToSave,
         cBase: cBaseToSave,
@@ -273,6 +251,7 @@ class OptimizationProblem {
         r: rToSave,
         entersVariable,
         comesOutVariable,
+        teta: [teta]
       }
 
       this.iterations.push(iterationData);
