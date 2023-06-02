@@ -3,8 +3,9 @@
 // DOM
 // Buttons
 const homeBtn = document.querySelector('.home-btn');
-const solveBtn = document.querySelector('.solve-btn');
+const problemsBtn = document.querySelector('.problems-btn');
 const startBtn = document.querySelector('.start-btn');
+const createBtn = document.querySelector('.create-btn');
 const optionBtns = document.querySelectorAll('.btn-option');
 const addRestBtn = document.querySelector('.add-rest-btn');
 const execSolveBtn = document.querySelector('.solve-exec-btn'); 
@@ -19,6 +20,15 @@ const numberVariablesInput = document.querySelector('.number-variables');
 // Container
 const zFunctionCont = document.querySelector('.z-function-cont');
 const restrictionsCont = document.querySelector('.restrictions-container');
+const standardModelCont = document.querySelector('.model-container');
+const problemsCont = document.querySelector('.problems-container');
+const iterationsCont = document.querySelector('.iterations-container');
+
+// Links
+const problemsLink = document.querySelector('.link-problems');
+
+// Msg
+const addProblemMsg = document.querySelector('.add-problem-msg');
 
 class App {
   decitionVariables = 2;
@@ -26,16 +36,22 @@ class App {
   z = {};
   restrictions = [];
   OPs = [];
+  selectedProblem;
 
   constructor() {
-    console.log('Hello from App!');
 
     // Event handlers
     homeBtn.addEventListener('click', this.#showSection);
-    solveBtn.addEventListener('click', this.#showSection);
-    startBtn.addEventListener('click', this.#showSection.bind(solveBtn));
+    problemsBtn.addEventListener('click', this.#showSection);
+    startBtn.addEventListener('click', this.#showSection.bind(problemsBtn));
+    createBtn.addEventListener('click', this.#showSection);
     addRestBtn.addEventListener('click', this.#createRestriction.bind(this));
     execSolveBtn.addEventListener('click', this.#newOP.bind(this));
+
+    problemsLink.addEventListener('click', this.#showSection.bind(problemsBtn));
+
+    problemsCont.addEventListener('click', this.#deleteProblem.bind(this));
+    problemsCont.addEventListener('click', this.#selectProblem.bind(this));
 
     // Number variables observer 
     const variablesObserver = new MutationObserver(this.#loadVariables.bind(this));
@@ -43,9 +59,130 @@ class App {
       characterData: true,
       subtree: true,
     });
+
+    this.#loadProblems();
+  }
+
+  // Problems
+  #loadProblems() {
+    problemsCont.innerHTML = '';
+
+    if(this.OPs.length === 0) { 
+      const msg =  `
+        <div class="add-problem-msg">
+          <span>No hay registro de problemas</span> 
+        </div>
+      `;
+      problemsCont.insertAdjacentHTML('afterbegin', msg);
+      return;
+    }
+
+    this.OPs.forEach((op, i) => {
+      const html = `
+        <article class="problem" data-problem-id="${op.id}">
+          <span class="problem-title">${i + 1} - OP</span> 
+          <div class="problem-element">
+            <span>Variables</span> 
+            <span class="problem-variables">${op.decitionVariables}</span> 
+          </div>
+          <div class="problem-element">
+            <span>Restricciones</span> 
+            <span class="problem-restrictions">${op.restrictions.length}</span> 
+          </div>
+          <div class="problem-element">
+            <span>Iteraciones</span> 
+            <span class="problem-iterations">${op.iterations.length}</span> 
+          </div>
+          <div class="problem-element">
+            <span>Estado</span> 
+            <span class="problem-status ${op.status ? 'ok' : 'err'}">${op.status ? 'Ok' : 'Err'}</span> 
+          </div>
+          <div class="problem-options">
+            <span class="op op-show" data-section="iterations">Ver</span>
+            <span class="op op-delete">Eliminar</span>
+          </div>
+        </article>
+      `;
+
+      problemsCont.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  #selectProblem(e) {
+    const el = e.target; 
+    if (el.classList.contains('op-show')) {
+      const problem = el.closest('.problem');
+      const problemId = problem.dataset.problemId;
+      this.selectedProblem = this.OPs.find(op => op.id === problemId );
+
+      this.#showSection.call(el);
+      this.#showIterations();
+    }
+  }
+
+  #showIterations() {
+    iterationsCont.innerHTML = ''; 
+    this.selectedProblem.iterations.forEach((iter, i) => {
+      const {
+        xBase,
+        cBase,
+        B,
+        r,
+        entersVariable,
+        comesOutVariable,
+      } = iter;
+      const html = `
+        <div class="iterations-container">
+          <h3 class="section-subtitle">ITERACIÓN #${i + 1}</h3>
+          <div class="iteration-content">
+            <div class="top-iteration">
+              <h3>Matrices Base</h3>
+              <div class="array-base-container-${i}">
+
+              </div>
+            </div>
+            <div class="bottom-iteration">
+              <h3>Solución</h3>
+              <div class="solution-container-${i}">
+
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      iterationsCont.insertAdjacentHTML('beforeend', html);
+      const arrayBaseCont = document.querySelector(`.array-base-container-${i}`);
+      const solutionCont = document.querySelector(`.solution-container-${i}`);
+      console.log(solutionCont);
+
+      // Base array's
+      this.#createArrayTemplate(xBase, 'x base', arrayBaseCont);
+      this.#createArrayTemplate(cBase, 'c base', arrayBaseCont);
+      this.#createArrayTemplate(B, 'B', arrayBaseCont);
+
+      // Solution
+      this.#createArrayTemplate(r, 'r', solutionCont);
+      this.#createArrayTemplate([entersVariable], 'Entra >', solutionCont);
+      this.#createArrayTemplate([comesOutVariable], 'Sale <', solutionCont);
+
+    });
+  }
+
+  #deleteProblem(e) {
+    const el = e.target;
+
+    // Match class
+    if (el.classList.contains('op-delete')) {
+      const problem = el.closest('.problem');
+      const problemId = problem.dataset.problemId;
+      this.OPs = this.OPs.filter(op => op.id != problemId);
+    }
+
+    this.#loadProblems();
   }
 
   #showSection() {
+    console.log(this);
     const btn = this;
     const sectionName = btn.dataset.section;
     const section = [...sections].find(sec => sec.classList.contains(`${sectionName}-section`));
@@ -69,8 +206,10 @@ class App {
   }
 
   #loadVariables(mutations) {
-    const [mutation] = mutations;
-    this.decitionVariables = +mutation.target.textContent;
+    if (mutations) {
+      const [mutation] = mutations;
+      this.decitionVariables = +mutation.target.textContent;
+    }
 
     zFunctionCont.innerHTML = '';
     restrictionsCont.innerHTML = '';
@@ -106,6 +245,8 @@ class App {
     `;
 
     const html = this.#createVariables();
+
+    if (!html) return;
     
     const restTemplate = initDiv + html + comparisonTemplate + resultTemplate + endDiv;
     restrictionsCont.insertAdjacentHTML('beforeend', restTemplate);
@@ -142,8 +283,39 @@ class App {
     // Get Restrictions
     this.#getRestrictions();
 
-    const optimizationProblem = new OptimizationProblem(this.isMaximization, this.z, this.restrictions);
+    const optimizationProblem = new OptimizationProblem(this.isMaximization, this.z, this.restrictions, this.decitionVariables);
     this.OPs.push(optimizationProblem);
+
+    // Show standard model section
+    this.#showSection.call(execSolveBtn);
+
+    // Show standard model
+    this.#showStandardModel(optimizationProblem);
+
+    // Settled selected problem
+    this.selectedProblem = optimizationProblem;
+
+    // Load problems
+    this.#loadProblems();
+
+    // Clear inputs
+    numberVariablesInput.textContent = 2; 
+    this.#loadVariables();
+    this.restrictions = [];
+    this.z = [];
+  }
+
+  #showStandardModel(OP) {
+    const { A, b, c, x } = OP.standardArrays;
+    const arrC = Object.values(c).map(variable => Object.values(variable)[0]);
+
+    // Clear container
+    standardModelCont.innerHTML = '';
+
+    this.#createArrayTemplate(x, 'x', standardModelCont);
+    this.#createArrayTemplate(arrC, 'c', standardModelCont);
+    this.#createArrayTemplate(b, 'b', standardModelCont);
+    this.#createArrayTemplate(A, 'A', standardModelCont);
   }
 
   #getFunctionValues() {
@@ -174,6 +346,39 @@ class App {
 
       this.restrictions.push(restriction);
     });
+  }
+
+  #createArrayTemplate(array, index = '', container) {
+    let arrTemplate = '';
+    const isMatrix = typeof array[0] === 'object';
+
+    if (isMatrix) {
+      array.forEach(arr => {
+        const arrString = arr
+          .map(value => `<span class="array-el">${value}</span>`)
+          .join('');
+        arrTemplate += `<span class="array-row">${arrString}</span>`;
+      });
+    }
+
+    if (!isMatrix) {
+      const arrString = array
+        .map(value => `<span class="array-el">${value}</span>`)
+        .join('');
+
+      arrTemplate = `<span class="array-row">${arrString}</span>`;
+    }
+
+    const html = `
+      <div class="letter-arr-container">
+        <p class="array-letter">${index}</p>
+        <div class="array-container">
+            ${ arrTemplate } 
+        </div>
+      </div>
+    `; 
+
+    container.insertAdjacentHTML('beforeend', html);
   }
 }
 
