@@ -138,8 +138,9 @@ class OptimizationProblem {
     const cTransposed = MatrixCalc.transposedMatrix(cValues);
     const bValues = this.standardArrays.b.map(value => [value]);
 
-    while(true) {
-      console.log("ITERACION: ");
+    let iter = 0;
+    while(iter < 100) {
+      console.log("ITERACION: ", iter + 1);
       const BInverse = MatrixCalc.inverseMatrix(B);
       const cBaseTransposed = MatrixCalc.transposedMatrix(cBase);
       // console.log(this.standardArrays.b);
@@ -284,6 +285,7 @@ class OptimizationProblem {
 
       // Todo - Next iteration?
       // Todo - Have solution?
+      iter++;
     }
   }
 

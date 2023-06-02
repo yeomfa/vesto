@@ -64,7 +64,6 @@ class App {
       subtree: true,
     });
 
-    this.#showNotify('success', 'Completado', 'Tiene solución real', 5000);
     this.#loadProblems();
   }
 
@@ -302,12 +301,15 @@ class App {
 
     // Get Problem Type
     this.isMaximization = problemTypeInput.value === 'maximization' ? true : false;
+    console.log(this.isMaximization);
 
     // Get Z Function
     this.#getFunctionValues();
+    console.log(this.z);
 
     // Get Restrictions
     this.#getRestrictions();
+    console.log(this.restrictions);
 
     const optimizationProblem = new OptimizationProblem(this.isMaximization, this.z, this.restrictions, this.decitionVariables);
     this.OPs.push(optimizationProblem);
