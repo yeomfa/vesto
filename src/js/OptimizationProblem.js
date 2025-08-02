@@ -1,4 +1,3 @@
-
 // Restrictions
 // const decitionVariables = 2; // x1, x2, ...
 // const isMaximization = true;
@@ -18,19 +17,23 @@
 // ];
 
 class OptimizationProblem {
+  id = Date.now().toString();
   slackVariables = {};
   artificialVariables = {};
   equations = [];
   zStandard = {};
   standardArrays = {};
-  baseArrays = {};
+  iterations = [];
+  status = true;
 
-  constructor(isMaximization, z, restrictions) {
+  constructor(isMaximization, z, restrictions, decitionVariables) {
     this.isMaximization = isMaximization;
     this.z = z;
     this.restrictions = restrictions;
+    this.decitionVariables = decitionVariables;
 
     this.#buildStandardModel();
+    this.solveProblem();
   }
 
   // Problem type
@@ -129,38 +132,175 @@ class OptimizationProblem {
 
   // Solve Problem
   solveProblem() {
-    // 1) Build base arrays xBase, cBase, B, BReserve
-    const {xBase, cBase, B, BReserve } = this.#buildBaseArrays();
+    // 1) Build base arrays xBase, cBase, B, BInverse
+    let {xBase, cBase, B } = this.#buildInitBaseArrays();
+    const cValues = Array.from(this.standardArrays.c, obj => [Object.values(obj).at(0)]);
+    const cTransposed = MatrixCalc.transposedMatrix(cValues);
+    const bValues = this.standardArrays.b.map(value => [value]);
 
-    // 2) Calc reduced cost r
-    // 3) Calc Breverse*A, select the same row as the minimum value in r, [enters]
-    // 4) Calc Breverse*b
-    // 5) Calc Breverse*b / selected row of Breverse*A, select minumum value (except infinity and negative values) [comes out]
-    // 6) Next iteration with new values
+    let iter = 0;
+    while(iter < 100) {
+      console.log("ITERACION: ", iter + 1);
+      const BInverse = MatrixCalc.inverseMatrix(B);
+      const cBaseTransposed = MatrixCalc.transposedMatrix(cBase);
+      // console.log(this.standardArrays.b);
+      // console.log('x base:', xBase);
+      // console.log('c base:', cBase);
+      // console.log('B', B);
+      // console.log('b inverse', BInverse);
+      // [][][][] x []
+      //            []
+      //            []
+      //            []
 
-    console.log("Solving problem...");
+      // 2) Calc reduced cost r
+      // console.log(this.standardArrays.A);
+      // console.log('cBase transposed', cBaseTransposed);
+
+
+      // cBaseTransposed * BInverse
+      const cBaseTransposedPerBInverse = MatrixCalc.multiplyMatrix(cBaseTransposed, BInverse);
+      // console.log('cbt * B inverse:', cBaseTransposedPerBInverse);
+
+
+      // cbt * bInverse * a
+      const cBaseTransposedPerBInversePerA = MatrixCalc.multiplyMatrix(cBaseTransposedPerBInverse, this.standardArrays.A);
+      // console.log('cbt * B inverse * A:', cBaseTransposedPerBInversePerA);
+
+      // r = cbt * bInverse * a - ct
+      const r = MatrixCalc.subtractMatrices(cBaseTransposedPerBInversePerA, cTransposed);
+      const rFlat = r.flat();
+
+      // Get enters variable
+      const minValueR = Math.min(...rFlat);
+      const entersIndex = rFlat.findIndex(value => value === minValueR);
+      const entersVariable = this.standardArrays.x[entersIndex];
+
+      // console.log('bValues: ', bValues);
+      // console.log('cValues: ', cValues);
+
+      // 3) Calc Breverse*b
+      const BInversePerB = MatrixCalc.multiplyMatrix(BInverse, bValues);
+
+      if (minValueR >= 0) {
+        const z = MatrixCalc.multiplyMatrix(cBaseTransposed, BInversePerB); 
+        const BInversePerBRound = MatrixCalc.roundMatrix(BInversePerB);
+        const xOptimized = [[], []];
+        this.standardArrays.x.forEach(key => {
+          const value = BInversePerBRound[xBase.indexOf(key)];
+          xOptimized[0].push(key);
+          if (value) {
+            xOptimized[1].push(value);
+          } else {
+            xOptimized[1].push(0);
+          };
+        });
+        this.status = true;
+
+        const xBaseToSave = [...xBase];
+        const cBaseToSave = cBase.map(val => val[0]);
+        const BToSave = B.map(row => [...row]);
+        const rToSave = [...r]; 
+
+        const iterationData = {
+          xOptimized,
+          xBase: xBaseToSave,
+          cBase: cBaseToSave,
+          B: BToSave,
+          r: rToSave,
+          z: z.flat()[0],
+        }
+
+        if(xBase.some(variable => variable.startsWith('u'))) this.status = false;
+        this.iterations.push(iterationData);
+
+        break;
+      }
+
+      // 4) Calc Breverse*A, select the same row as the minimum value in r, [enters]
+      const BInversePerA = MatrixCalc.multiplyMatrix(BInverse, this.standardArrays.A);
+
+      // Select row in BInversePerA
+      const selectedRow = BInversePerA.map(row => row[entersIndex]);
+
+
+      // 5) Calc Breverse*b / selected row of Breverse*A, select minumum value (except infinity and negative values) [comes out]
+      const BInversePerBFlat = BInversePerB.flat();
+      // console.log(BInversePerBFlat);
+      const teta = BInversePerBFlat.map((value, i) => value / selectedRow[i]);
+      const comesOutArray = [...teta].sort((a, b) => a - b);
+      const comesOutValue = comesOutArray.find(value => value >= 0);
+      const comesOutIndex = teta.indexOf(comesOutValue);
+      const comesOutVariable = xBase[comesOutIndex];
+
+      // z = cbt * bInverse * b
+      const z = MatrixCalc.multiplyMatrix(cBaseTransposed, BInversePerB); 
+
+
+      // Save iteration data
+      const xBaseToSave = [...xBase];
+      const cBaseToSave = cBase.map(val => val[0]);
+      const BToSave = B.map(row => [...row]);
+      const rToSave = [...r]; 
+
+      console.log(teta);
+      const iterationData = {
+        xBase: xBaseToSave,
+        cBase: cBaseToSave,
+        B: BToSave,
+        r: rToSave,
+        entersVariable,
+        comesOutVariable,
+        teta: [teta]
+      }
+
+      this.iterations.push(iterationData);
+
+
+      // 6) Next iteration with new values
+      xBase[comesOutIndex] = entersVariable;
+      cBase[comesOutIndex] = cValues[entersIndex];
+      B = this.#buildB(xBase);
+
+      // Todo - Next iteration?
+      // Todo - Have solution?
+      iter++;
+    }
   }
 
   // Build base arrys
-  #buildBaseArrays() {
+  #buildInitBaseArrays() {
     // x base
-    this.baseArrays.xBase = this.standardArrays.x
+    const xBase = this.standardArrays.x
       .filter(variable => this.slackVariables[variable] === 1 || variable in this.artificialVariables);
 
     // c base
-    this.baseArrays.cBase = this.baseArrays.xBase
+    const cBase = xBase
       .map(variable => {
         const variableObj = this.standardArrays.c
           .find(varObj => variable in varObj);
 
-        return variableObj[variable];
+        console.log([variableObj[variable]]); 
+        return [variableObj[variable]];
       });
 
     // B
-    this.baseArrays.B = this.equations.map(equation => {
+    const B = this.#buildB(xBase);
+
+    return {
+      xBase,
+      cBase,
+      B,
+      // BReserve,
+    } 
+  }
+  
+  #buildB(xBase) {
+    const B = this.equations.map(equation => {
       const row = [];
 
-      this.baseArrays.xBase.forEach(x => {
+      // [s4, u1, u2, u3]
+      xBase.forEach(x => {
         if (x in equation) row.push(equation[x]);
         else row.push(0);
       })
@@ -168,39 +308,6 @@ class OptimizationProblem {
       return row;
     });
 
-    console.log(this.baseArrays.xBase);
-    console.log(this.baseArrays.cBase);
-    console.log(this.baseArrays.B);
-
-    return {
-      xBase: this.baseArrays.xBase,
-      // cBase,
-      // B,
-      // BReserve,
-    } 
+    return B;
   }
-
-  // Parse Equations
-  parseEquation(equation) {
-    const equationParsed = Object.entries(equation)
-      .map(([varName, varValue], i) => {
-        let operator = '';
-        let value = varValue;
-
-        if(varValue < 0) {
-          operator = ' - ';
-          value = varValue === -1 ? 0 : varValue * -1;
-        } else {
-          if(i !== 0) {
-            operator = ' + ';
-            value = varValue === 1 ? 0 : varValue;
-          }
-        }  
-
-        return `${operator}${value}${varName}`;
-      });
-
-    return equationParsed.join('');
-  }
-
 }

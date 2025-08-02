@@ -5,8 +5,8 @@
     <title>Vesto - Simplex Calculator</title>
     <link rel="stylesheet" href="src/styles/styles.css">
     <link rel="icon" href="public/vesto-favicon.png">
+    <script defer src="src/js/MatrixCalc.js"></script>
     <script defer src="src/js/OptimizationProblem.js"></script>
-    <script defer src="src/js/getInverseMatrix.js"></script>
     <script defer src="src/main.js"></script>
   </head>
   <body>
@@ -24,18 +24,24 @@
           Inicio
         </button>
         <button 
-          class="btn-option solve-btn"
-          data-section="solve"
+          class="btn-option problems-btn"
+          data-section="problems"
         >
-          Resolver
+          Problemas
         </button>
         <img class="option toggle-theme" src="src/assets/icons/sun.png" alt="Toggle theme">
         <img class="option github" src="src/assets/icons/github.png" alt="Github repository">
       </div>     
     </nav>
+    <div class="notify hidden">
+      <div class="notify-header">
+        <h2></h2> 
+      </div>
+      <p class="notify-body"></p> 
+    </div>
 
     <!-- Home -->
-    <section class="section home-section hidden">
+    <section class="section home-section">
       <div class="home-content">
         <img class="logo" src="public/blue-vesto-logo.png" alt="Vesto blue logo">
         <div class="subtitle">
@@ -55,8 +61,11 @@
     </section>
 
     <!-- Solve -->
-    <section class="section solve-section ">
-      <h3 class="section-subtitle">VALORES INICIALES</h3>
+    <section class="section solve-section hidden">
+      <div class="header-link">
+        <h3 class="section-subtitle">VALORES INICIALES</h3>
+        <p class="link link-problems">< Volver</p>
+      </div>
 
       <!-- Form -->
       <form class="form-init-values">
@@ -67,8 +76,8 @@
             <div class="input-cont input-problem-type">
               <label for="problem-type">Tipo de problema</label>
               <select class="input-field problem-type">
-                <option selected value="maximization">Maximización</option>
-                <option value="minimization">Minimización</option>
+                <option value="maximization">Maximización</option>
+                <option selected value="minimization">Minimización</option>
               </select>
             </div>
 
@@ -85,12 +94,12 @@
               <!-- Variables values -->
               <div class="variables-values z-function-cont">
                 <div class="var">
-                  <span class="input-field x-var" data-id="1" role="textbox" contenteditable></span>
+                  <span class="input-field x-var" data-id="1" role="textbox" contenteditable>120</span>
                   <p class="variable">X<span class="subscript">1</span></p>
                 </div>
                 +
                 <div class="var">
-                  <span class="input-field x-var" data-id="2" role="textbox" contenteditable></span>
+                  <span class="input-field x-var" data-id="2" role="textbox" contenteditable>200</span>
                   <p class="variable">X<span class="subscript">2</span></p>
                 </div>
               </div>
@@ -98,7 +107,7 @@
 
           </div>
 
-          <div class="values-container">
+          <div class="restrictions-content">
             <!-- Restrictions -->
             <div class="inputs-bottom restrictions">
               <label for="restrictions">Restricciones</label>
@@ -107,12 +116,34 @@
               <div class="restrictions-container">
                 <div class="variables-values restriction-cont">
                   <div class="var">
-                    <span class="input-field x-var" data-id="1" role="textbox" contenteditable></span>
+                    <span class="input-field x-var" data-id="1" role="textbox" contenteditable>1</span>
                     <p class="variable">X<span class="subscript">1</span></p>
                   </div>
                   +
                   <div class="var">
-                    <span class="input-field x-var" data-id="2" role="textbox" contenteditable></span>
+                    <span class="input-field x-var" data-id="2" role="textbox" contenteditable>1</span>
+                    <p class="variable">X<span class="subscript">2</span></p>
+                  </div>
+
+                  <!-- Comparison -->
+                  <select class="input-field comparison">
+                    <option value=">=">≥</option>
+                    <option value="<=">≤</option>
+                    <option selected value="=">=</option>
+                  </select>
+
+                  <!-- Result -->
+                  <span class="input-field result" role="textbox" contenteditable>65</span>
+
+                </div>
+                <div class="variables-values restriction-cont">
+                  <div class="var">
+                    <span class="input-field x-var" data-id="1" role="textbox" contenteditable>1</span>
+                    <p class="variable">X<span class="subscript">1</span></p>
+                  </div>
+                  +
+                  <div class="var">
+                    <span class="input-field x-var" data-id="2" role="textbox" contenteditable>0</span>
                     <p class="variable">X<span class="subscript">2</span></p>
                   </div>
 
@@ -124,7 +155,51 @@
                   </select>
 
                   <!-- Result -->
-                  <span class="input-field result" role="textbox" contenteditable></span>
+                  <span class="input-field result" role="textbox" contenteditable>23</span>
+
+                </div>
+                <div class="variables-values restriction-cont">
+                  <div class="var">
+                    <span class="input-field x-var" data-id="1" role="textbox" contenteditable>0</span>
+                    <p class="variable">X<span class="subscript">1</span></p>
+                  </div>
+                  +
+                  <div class="var">
+                    <span class="input-field x-var" data-id="2" role="textbox" contenteditable>1</span>
+                    <p class="variable">X<span class="subscript">2</span></p>
+                  </div>
+
+                  <!-- Comparison -->
+                  <select class="input-field comparison">
+                    <option selected value=">=">≥</option>
+                    <option value="<=">≤</option>
+                    <option value="=">=</option>
+                  </select>
+
+                  <!-- Result -->
+                  <span class="input-field result" role="textbox" contenteditable>20</span>
+
+                </div>
+                <div class="variables-values restriction-cont">
+                  <div class="var">
+                    <span class="input-field x-var" data-id="1" role="textbox" contenteditable>60</span>
+                    <p class="variable">X<span class="subscript">1</span></p>
+                  </div>
+                  +
+                  <div class="var">
+                    <span class="input-field x-var" data-id="2" role="textbox" contenteditable>24</span>
+                    <p class="variable">X<span class="subscript">2</span></p>
+                  </div>
+
+                  <!-- Comparison -->
+                  <select class="input-field comparison">
+                    <option value=">=">≥</option>
+                    <option selected value="<=">≤</option>
+                    <option value="=">=</option>
+                  </select>
+
+                  <!-- Result -->
+                  <span class="input-field result" role="textbox" contenteditable>3000</span>
 
                 </div>
               </div>
@@ -135,7 +210,7 @@
           </div>
         </div>
         <div class="solve-btn-container">
-          <button class="main-btn solve-exec-btn" type="submit">Resolver</button>
+          <button class="main-btn solve-exec-btn" data-section="standard-model" type="submit">Resolver</button>
         </div>
 
       </form>
@@ -144,12 +219,62 @@
 
     <!-- Standard Model -->
     <section class="section standard-model-section hidden">
-      
+      <div class="header-link">
+        <h3 class="section-subtitle">MODELO ESTÁNDAR</h3>
+        <p class="link link-iterations">Iteraciones ></p>
+      </div>
+      <div class="model-container">
+
+        <div class="letter-arr-container">
+          <p class="array-letter">A</p>
+          <div class="array-container">
+            <span class="array-row">
+              <span class="array-el">1</span>
+              <span class="array-el" >-2</span>
+              <span class="array-el">32</span>
+              <span class="array-el">4</span>
+            </span> 
+            <span class="array-row">
+              <span class="array-el">1</span>
+              <span class="array-el" >-2</span>
+              <span class="array-el">2</span>
+              <span class="array-el">4</span>
+            </span> 
+            <span class="array-row">
+              <span class="array-el">1</span>
+              <span class="array-el" >-2</span>
+              <span class="array-el">-1</span>
+              <span class="array-el">4</span>
+            </span> 
+            <span class="array-row">
+              <span class="array-el">60</span>
+              <span class="array-el" >120</span>
+              <span class="array-el">32</span>
+              <span class="array-el">4</span>
+            </span> 
+          </div>
+        </div>
+
+      </div>
+      <div class="solve-btn-container">
+        <button class="main-btn btn-solution" data-section="iterations" type="submit">Solución</button>
+      </div>
+    </section>
+
+    <!-- Problems -->
+    <section class="section problems-section hidden">
+      <h3 class="section-subtitle">PROBLEMAS DE OPTIMIZACIÓN</h3>
+      <div class="create-btn-container">
+        <button class="create-btn" data-section="solve">+ Crear</button>
+      </div>
+      <div class="problems-container">
+      </div> 
     </section>
 
     <!-- Iteration -->
-    <section class="section iteration-section hidden">
-      
+    <section class="section iterations-section hidden">
+      <div class="iterations-container">
+      </div>
     </section>
   </body>
 </html>
