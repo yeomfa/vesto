@@ -1,13 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <title>Vesto - Simplex Calculator</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="style.css" rel="stylesheet">
-    <script defer src="main.js"></script>
+    <title>Vesto - Simplex Calculator</title>
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <link rel="icon" href="public/vesto-favicon.png">
+    <script defer src="src/js/OptimizationProblem.js"></script>
+    <script defer src="src/js/getInverseMatrix.js"></script>
+    <script defer src="src/main.js"></script>
   </head>
   <body>
-    <h1>Hello Vesto</h1>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="logo-text">
+        <img class="logo-nav" src="public/vesto-favicon.png" alt="Vesto logo">
+        <span class="text-vesto">Vesto</span>
+      </div>
+      <div class="options">
+        <button 
+          class="btn-option home-btn active"
+          data-section="home"
+        >
+          Inicio
+        </button>
+        <button 
+          class="btn-option solve-btn"
+          data-section="solve"
+        >
+          Resolver
+        </button>
+        <img class="option toggle-theme" src="src/assets/icons/sun.png" alt="Toggle theme">
+        <img class="option github" src="src/assets/icons/github.png" alt="Github repository">
+      </div>     
+    </nav>
+
+    <!-- Home -->
+    <section class="section home-section hidden">
+      <div class="home-content">
+        <img class="logo" src="public/blue-vesto-logo.png" alt="Vesto blue logo">
+        <div class="subtitle">
+          Vesto es rápido, optimizado e intuitivo
+        </div>
+        <div class="additional-text">
+          Potenciado para la resolución de problemas de optimización mediante el método simplex.
+        </div>
+        <button class="main-btn start-btn">Empezar</button>
+        <div class="details">
+          <p>v0.0.1-beta</p>
+          <p class="made-with-love">Made with <img class="heart" src="src/assets/icons/heart.png" alt="heart"></p>
+        </div>
+      </div>
+      <div class="bg-home"></div>
+      <div class="blur"></div>
+    </section>
+
+    <!-- Solve -->
+    <section class="section solve-section ">
+      <h3 class="section-subtitle">VALORES INICIALES</h3>
+
+      <!-- Form -->
+      <form class="form-init-values">
+        <div class="init-values-container">
+          <div class="values-container">
+
+            <!-- Problem type -->
+            <div class="input-cont input-problem-type">
+              <label for="problem-type">Tipo de problema</label>
+              <select class="input-field problem-type">
+                <option selected value="maximization">Maximización</option>
+                <option value="minimization">Minimización</option>
+              </select>
+            </div>
+
+            <!-- Number of variables -->
+            <div class="input-cont input-problem-variables">
+              <label for="number-variables">Cant. Variables</label>
+              <span class="input-field number-variables" role="textbox" contenteditable>2</span>
+            </div>
+
+            <!-- Z function -->
+            <div class="inputs-bottom function">
+              <label class="z-function" for="z-function">Función Z</label>
+
+              <!-- Variables values -->
+              <div class="variables-values z-function-cont">
+                <div class="var">
+                  <span class="input-field x-var" data-id="1" role="textbox" contenteditable></span>
+                  <p class="variable">X<span class="subscript">1</span></p>
+                </div>
+                +
+                <div class="var">
+                  <span class="input-field x-var" data-id="2" role="textbox" contenteditable></span>
+                  <p class="variable">X<span class="subscript">2</span></p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="values-container">
+            <!-- Restrictions -->
+            <div class="inputs-bottom restrictions">
+              <label for="restrictions">Restricciones</label>
+
+              <!-- Restrictions container -->
+              <div class="restrictions-container">
+                <div class="variables-values restriction-cont">
+                  <div class="var">
+                    <span class="input-field x-var" data-id="1" role="textbox" contenteditable></span>
+                    <p class="variable">X<span class="subscript">1</span></p>
+                  </div>
+                  +
+                  <div class="var">
+                    <span class="input-field x-var" data-id="2" role="textbox" contenteditable></span>
+                    <p class="variable">X<span class="subscript">2</span></p>
+                  </div>
+
+                  <!-- Comparison -->
+                  <select class="input-field comparison">
+                    <option selected value=">=">≥</option>
+                    <option value="<=">≤</option>
+                    <option value="=">=</option>
+                  </select>
+
+                  <!-- Result -->
+                  <span class="input-field result" role="textbox" contenteditable></span>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- Button add restriction -->
+            <button type="button" class="add-rest-btn">Agregar</button>
+          </div>
+        </div>
+        <div class="solve-btn-container">
+          <button class="main-btn solve-exec-btn" type="submit">Resolver</button>
+        </div>
+
+      </form>
+      
+    </section>
+
+    <!-- Standard Model -->
+    <section class="section standard-model-section hidden">
+      
+    </section>
+
+    <!-- Iteration -->
+    <section class="section iteration-section hidden">
+      
+    </section>
   </body>
 </html>
+
